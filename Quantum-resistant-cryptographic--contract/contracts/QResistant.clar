@@ -388,3 +388,49 @@
 (define-read-only (get-hash-chain-info (chain-id (buff 32)) (position uint))
     (map-get? hash-chains { chain-id: chain-id, position: position })
 )
+
+;; Get current chain length
+(define-read-only (get-chain-length (chain-id (buff 32)))
+    (let (
+        (position u0)
+        (max-search u1000) ;; Prevent infinite loops
+    )
+    (fold check-chain-position (list u0 u1 u2 u3 u4 u5 u6 u7 u8 u9) u1)
+    )
+)
+
+;; Helper function for chain length calculation
+(define-read-only (check-chain-position (pos uint) (current-max uint))
+    (if (is-some (map-get? hash-chains { chain-id: 0x00, position: pos }))
+        (+ pos u1)
+        current-max
+    )
+)
+
+;; Get current quantum threat level
+(define-read-only (get-quantum-threat-level)
+    (var-get quantum-threat-level)
+)
+
+;; Get total registered quantum keys
+(define-read-only (get-total-quantum-keys)
+    (var-get total-quantum-keys)
+)
+
+;; Verify if a signature is quantum-resistant
+(define-read-only (is-quantum-resistant-signature (signer principal) (message-hash (buff 32)))
+    (match (map-get? quantum-signatures { signer: signer, message-hash: message-hash })
+        signature-data (get verified signature-data)
+        false
+    )
+)
+
+;; Get contract statistics
+(define-read-only (get-contract-stats)
+    {
+        total-keys: (var-get total-quantum-keys),
+        threat-level: (var-get quantum-threat-level),
+        contract-nonce: (var-get contract-nonce),
+        current-height: block-height
+    }
+)
