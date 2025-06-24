@@ -41,3 +41,15 @@
         is-active: bool
     }
 )
+
+;; Map for storing quantum-resistant signatures
+(define-map quantum-signatures
+    { signer: principal, message-hash: (buff 32) }
+    {
+        dilithium-sig: (buff 2420),
+        sphincs-sig: (buff 17088),
+        timestamp: uint,
+        block-height: uint,
+        verified: bool
+    }
+)
