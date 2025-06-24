@@ -64,3 +64,15 @@
         access-count: uint
     }
 )
+
+;; Map for quantum-safe merkle tree roots
+(define-map merkle-roots
+    uint ;; root-id
+    {
+        root-hash: (buff 32),
+        tree-height: uint,
+        leaf-count: uint,
+        creation-block: uint,
+        is-quantum-safe: bool
+    }
+)
