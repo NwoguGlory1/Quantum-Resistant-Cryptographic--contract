@@ -20,3 +20,7 @@
 ;; Hash-based signature parameters (SPHINCS+-like)
 (define-constant SPHINCS_PUBLIC_KEY_SIZE u32)
 (define-constant SPHINCS_SIGNATURE_SIZE u17088)
+
+;; Lattice-based encryption parameters
+(define-constant KYBER_PUBLIC_KEY_SIZE u800)
+(define-constant KYBER_CIPHERTEXT_SIZE u768)
