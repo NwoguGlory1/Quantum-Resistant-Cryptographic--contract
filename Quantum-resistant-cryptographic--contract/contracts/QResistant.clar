@@ -11,3 +11,8 @@
 (define-constant ERR_NOT_FOUND (err u104))
 (define-constant ERR_INVALID_LATTICE_PARAMS (err u105))
 (define-constant ERR_QUANTUM_THRESHOLD_EXCEEDED (err u106))
+
+;; Post-quantum signature scheme parameters (Dilithium-like)
+(define-constant DILITHIUM_PUBLIC_KEY_SIZE u1312)
+(define-constant DILITHIUM_SIGNATURE_SIZE u2420)
+(define-constant DILITHIUM_SEED_SIZE u32)
