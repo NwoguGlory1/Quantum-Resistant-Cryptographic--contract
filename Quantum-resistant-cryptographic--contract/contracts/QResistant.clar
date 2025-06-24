@@ -267,3 +267,51 @@
     (ok true)
     )
 )
+
+;; Create quantum-safe merkle root
+(define-public (create-quantum-merkle-root
+    (root-id uint)
+    (root-hash (buff 32))
+    (tree-height uint)
+    (leaf-count uint)
+)
+    (begin
+    (asserts! (is-eq tx-sender CONTRACT_OWNER) ERR_UNAUTHORIZED)
+    (asserts! (is-none (map-get? merkle-roots root-id)) ERR_ALREADY_EXISTS)
+    (asserts! (> tree-height u0) ERR_INVALID_HASH)
+    (asserts! (> leaf-count u0) ERR_INVALID_HASH)
+    
+    (map-set merkle-roots root-id {
+        root-hash: root-hash,
+        tree-height: tree-height,
+        leaf-count: leaf-count,
+        creation-block: block-height,
+        is-quantum-safe: true
+    })
+    
+    (ok root-id)
+    )
+)
+
+;; Initialize hash chain for quantum-resistant verification
+(define-public (initialize-hash-chain
+    (chain-id (buff 32))
+    (initial-hash (buff 32))
+)
+    (let (
+        (chain-key { chain-id: chain-id, position: u0 })
+        (quantum-nonce (generate-quantum-nonce))
+        (chain-hash (post-quantum-hash (concat initial-hash quantum-nonce)))
+    )
+    (asserts! (is-none (map-get? hash-chains chain-key)) ERR_ALREADY_EXISTS)
+    
+    (map-set hash-chains chain-key {
+        hash-value: chain-hash,
+        previous-hash: initial-hash,
+        chain-length: u1,
+        verification-count: u0
+    })
+    
+    (ok chain-hash)
+    )
+)
