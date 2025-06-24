@@ -24,3 +24,9 @@
 ;; Lattice-based encryption parameters
 (define-constant KYBER_PUBLIC_KEY_SIZE u800)
 (define-constant KYBER_CIPHERTEXT_SIZE u768)
+
+;; Data Variables
+(define-data-var quantum-threat-level uint u0)
+(define-data-var total-quantum-keys uint u0)
+(define-data-var contract-nonce uint u0)
+
