@@ -30,3 +30,14 @@
 (define-data-var total-quantum-keys uint u0)
 (define-data-var contract-nonce uint u0)
 
+;; Maps for quantum-resistant key storage
+(define-map quantum-public-keys 
+    principal 
+    {
+        dilithium-key: (buff 1312),
+        sphincs-key: (buff 32),
+        kyber-key: (buff 800),
+        key-generation-height: uint,
+        is-active: bool
+    }
+)
