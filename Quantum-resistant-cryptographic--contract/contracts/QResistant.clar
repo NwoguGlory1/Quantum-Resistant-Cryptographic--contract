@@ -16,3 +16,7 @@
 (define-constant DILITHIUM_PUBLIC_KEY_SIZE u1312)
 (define-constant DILITHIUM_SIGNATURE_SIZE u2420)
 (define-constant DILITHIUM_SEED_SIZE u32)
+
+;; Hash-based signature parameters (SPHINCS+-like)
+(define-constant SPHINCS_PUBLIC_KEY_SIZE u32)
+(define-constant SPHINCS_SIGNATURE_SIZE u17088)
