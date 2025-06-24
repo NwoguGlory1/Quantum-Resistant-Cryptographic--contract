@@ -315,3 +315,76 @@
     (ok chain-hash)
     )
 )
+
+;; Extend hash chain with quantum-resistant hash
+(define-public (extend-hash-chain
+    (chain-id (buff 32))
+    (new-data (buff 32))
+)
+    (let (
+        (current-position (get-chain-length chain-id))
+        (current-key { chain-id: chain-id, position: (- current-position u1) })
+        (new-key { chain-id: chain-id, position: current-position })
+        (current-chain (unwrap! (map-get? hash-chains current-key) ERR_NOT_FOUND))
+        (new-hash (post-quantum-hash (concat (get hash-value current-chain) new-data)))
+    )
+    (map-set hash-chains new-key {
+        hash-value: new-hash,
+        previous-hash: (get hash-value current-chain),
+        chain-length: (+ current-position u1),
+        verification-count: u0
+    })
+    
+    (ok new-hash)
+    )
+)
+
+;; Update quantum threat level (admin only)
+(define-public (update-quantum-threat-level (level uint))
+    (begin
+    (asserts! (is-eq tx-sender CONTRACT_OWNER) ERR_UNAUTHORIZED)
+    (asserts! (<= level u10) ERR_QUANTUM_THRESHOLD_EXCEEDED)
+    (var-set quantum-threat-level level)
+    (ok level)
+    )
+)
+
+;; Deactivate quantum keys (emergency function)
+(define-public (deactivate-quantum-keys)
+    (let (
+        (caller tx-sender)
+        (current-keys (unwrap! (map-get? quantum-public-keys caller) ERR_NOT_FOUND))
+    )
+    (map-set quantum-public-keys caller
+        (merge current-keys { is-active: false })
+    )
+    (ok true)
+    )
+)
+
+;; Read-only functions
+
+;; Get quantum public keys for a user
+(define-read-only (get-quantum-keys (user principal))
+    (map-get? quantum-public-keys user)
+)
+
+;; Get quantum signature verification status
+(define-read-only (get-signature-status (signer principal) (message-hash (buff 32)))
+    (map-get? quantum-signatures { signer: signer, message-hash: message-hash })
+)
+
+;; Get encrypted data information
+(define-read-only (get-encrypted-data-info (owner principal) (data-id (buff 32)))
+    (map-get? encrypted-data-store { owner: owner, data-id: data-id })
+)
+
+;; Get merkle root information
+(define-read-only (get-merkle-root (root-id uint))
+    (map-get? merkle-roots root-id)
+)
+
+;; Get hash chain information
+(define-read-only (get-hash-chain-info (chain-id (buff 32)) (position uint))
+    (map-get? hash-chains { chain-id: chain-id, position: position })
+)
