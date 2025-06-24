@@ -208,3 +208,62 @@
     (ok true)
     )
 )
+
+;; Create and store quantum-resistant signature
+(define-public (create-quantum-signature
+    (message-hash (buff 32))
+    (dilithium-sig (buff 2420))
+    (sphincs-sig (buff 17088))
+)
+    (let (
+        (caller tx-sender)
+        (user-keys (unwrap! (map-get? quantum-public-keys caller) ERR_NOT_FOUND))
+        (sig-key { signer: caller, message-hash: message-hash })
+    )
+    (asserts! (get is-active user-keys) ERR_UNAUTHORIZED)
+    (asserts! (is-none (map-get? quantum-signatures sig-key)) ERR_ALREADY_EXISTS)
+    
+    ;; Verify the lattice-based signature
+    (asserts! (verify-lattice-signature 
+        (get dilithium-key user-keys)
+        dilithium-sig
+        message-hash
+    ) ERR_INVALID_SIGNATURE)
+    
+    (map-set quantum-signatures sig-key {
+        dilithium-sig: dilithium-sig,
+        sphincs-sig: sphincs-sig,
+        timestamp: (unwrap-panic (get-block-info? time (- block-height u1))),
+        block-height: block-height,
+        verified: true
+    })
+    
+    (ok true)
+    )
+)
+
+;; Store encrypted data using post-quantum encryption
+(define-public (store-encrypted-data
+    (data-id (buff 32))
+    (kyber-ciphertext (buff 768))
+    (metadata-hash (buff 32))
+)
+    (let (
+        (caller tx-sender)
+        (storage-key { owner: caller, data-id: data-id })
+        (user-keys (unwrap! (map-get? quantum-public-keys caller) ERR_NOT_FOUND))
+    )
+    (asserts! (get is-active user-keys) ERR_UNAUTHORIZED)
+    (asserts! (is-none (map-get? encrypted-data-store storage-key)) ERR_ALREADY_EXISTS)
+    (asserts! (is-eq (len kyber-ciphertext) KYBER_CIPHERTEXT_SIZE) ERR_INVALID_LATTICE_PARAMS)
+    
+    (map-set encrypted-data-store storage-key {
+        kyber-ciphertext: kyber-ciphertext,
+        metadata-hash: metadata-hash,
+        encryption-height: block-height,
+        access-count: u0
+    })
+    
+    (ok true)
+    )
+)
