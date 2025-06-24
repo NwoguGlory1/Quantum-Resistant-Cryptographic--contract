@@ -53,3 +53,14 @@
         verified: bool
     }
 )
+
+;; Map for lattice-based encrypted data
+(define-map encrypted-data-store
+    { owner: principal, data-id: (buff 32) }
+    {
+        kyber-ciphertext: (buff 768),
+        metadata-hash: (buff 32),
+        encryption-height: uint,
+        access-count: uint
+    }
+)
