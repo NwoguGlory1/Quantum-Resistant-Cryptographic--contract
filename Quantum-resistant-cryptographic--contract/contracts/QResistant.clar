@@ -178,3 +178,33 @@
            (unwrap-panic (slice? key-hash u0 u16)))
     )
 )
+
+;; Public Functions
+
+;; Register quantum-resistant public keys
+(define-public (register-quantum-keys 
+    (dilithium-key (buff 1312))
+    (sphincs-key (buff 32))
+    (kyber-key (buff 800))
+)
+    (let (
+        (caller tx-sender)
+        (current-height block-height)
+    )
+    (asserts! (validate-dilithium-key dilithium-key) ERR_INVALID_LATTICE_PARAMS)
+    (asserts! (validate-sphincs-key sphincs-key) ERR_INVALID_LATTICE_PARAMS)
+    (asserts! (validate-kyber-key kyber-key) ERR_INVALID_LATTICE_PARAMS)
+    (asserts! (is-none (map-get? quantum-public-keys caller)) ERR_ALREADY_EXISTS)
+    
+    (map-set quantum-public-keys caller {
+        dilithium-key: dilithium-key,
+        sphincs-key: sphincs-key,
+        kyber-key: kyber-key,
+        key-generation-height: current-height,
+        is-active: true
+    })
+    
+    (var-set total-quantum-keys (+ (var-get total-quantum-keys) u1))
+    (ok true)
+    )
+)
