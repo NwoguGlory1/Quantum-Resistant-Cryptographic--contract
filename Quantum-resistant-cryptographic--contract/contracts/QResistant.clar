@@ -142,3 +142,39 @@
         )
     ))
 )
+
+;; Verify lattice-based signature simulation
+(define-private (verify-lattice-signature 
+    (public-key (buff 1312)) 
+    (signature (buff 2420)) 
+    (message-hash (buff 32))
+)
+    (let (
+        (combined-data (concat (concat public-key signature) message-hash))
+        (verification-hash (post-quantum-hash combined-data))
+        (key-hash (sha256 public-key))
+    )
+    ;; Simplified verification - in real implementation, this would involve
+    ;; complex lattice-based mathematical operations
+    (is-eq (unwrap-panic (slice? verification-hash u0 u16)) 
+           (unwrap-panic (slice? key-hash u0 u16)))
+    )
+)
+
+;; Verify lattice-based signature simulation
+(define-private (verify-lattice-signature 
+    (public-key (buff 1312)) 
+    (signature (buff 2420)) 
+    (message-hash (buff 32))
+)
+    (let (
+        (combined-data (concat (concat public-key signature) message-hash))
+        (verification-hash (post-quantum-hash combined-data))
+        (key-hash (sha256 public-key))
+    )
+    ;; Simplified verification - in real implementation, this would involve
+    ;; complex lattice-based mathematical operations
+    (is-eq (unwrap-panic (slice? verification-hash u0 u16)) 
+           (unwrap-panic (slice? key-hash u0 u16)))
+    )
+)
