@@ -100,3 +100,19 @@
     )
     round4)
 )
+
+;; Validate Dilithium-style public key format
+(define-private (validate-dilithium-key (key (buff 1312)))
+    (and 
+        (is-eq (len key) DILITHIUM_PUBLIC_KEY_SIZE)
+        (> (buff-to-uint-be (unwrap-panic (slice? key u0 u8))) u0)
+    )
+)
+
+;; Validate SPHINCS+-style public key format
+(define-private (validate-sphincs-key (key (buff 32)))
+    (and 
+        (is-eq (len key) SPHINCS_PUBLIC_KEY_SIZE)
+        (not (is-eq key 0x0000000000000000000000000000000000000000000000000000000000000000))
+    )
+)
