@@ -116,3 +116,29 @@
         (not (is-eq key 0x0000000000000000000000000000000000000000000000000000000000000000))
     )
 )
+
+;; Validate Kyber-style public key format
+(define-private (validate-kyber-key (key (buff 800)))
+    (and 
+        (is-eq (len key) KYBER_PUBLIC_KEY_SIZE)
+        (> (buff-to-uint-be (unwrap-panic (slice? key u0 u8))) u0)
+    )
+)
+
+;; Generate quantum-safe random nonce
+(define-private (generate-quantum-nonce)
+    (let (
+        (current-nonce (var-get contract-nonce))
+        (block-hash (unwrap-panic (get-block-info? id-header-hash (- block-height u1))))
+        (timestamp-buff (int-to-ascii block-height))
+    )
+    (begin
+        (var-set contract-nonce (+ current-nonce u1))
+        (post-quantum-hash 
+            (concat 
+                (concat block-hash (unwrap-panic (as-max-len? timestamp-buff u32)))
+                (int-to-ascii current-nonce)
+            )
+        )
+    ))
+)
